@@ -7,7 +7,7 @@ class File(Base):
     
     id = Column(Integer, primary_key=True, autoincrement= True)
     date = Column(DateTime)
-    file_name = Column(String)
+    file_name = Column(String, unique=True)
     location = Column(String)
 
 
