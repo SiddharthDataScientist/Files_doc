@@ -45,21 +45,6 @@ class FileRequest(BaseModel):
     file_name : str 
     location : str
 
-# def get_files(filereq, db):
-#     folder_name = "Songs"
-#     folder_path = os.path.expanduser("~/Desktop")+ "/" + folder_name
-#     files = os.listdir(folder_path)
-#     date = datetime.now()
-#     print(files)
-#     filereq.__dict__.update(
-#         date_= date,
-#         file_name = folder_name
-#         location = folder_path
-#     )
-#     existing_file = db.query(File).filter(File.file_name == folder_name).all()
-
-#     return existing_file
-
 
 
 @app.get("/")
@@ -72,8 +57,8 @@ async def update_table(db:db_dependency):
         if filename in list_files:
             continue
         else:
-            file = file(file_name =filename, location = location, date =date)
-            db.add(file)
+            new_file = File(file_name =filename, location = location, date =date)
+            db.add(new_file)
     db.commit()
 
 
@@ -87,12 +72,14 @@ async def update_file_name(file_id: int , db: db_dependency, filename: str):
 
 
 @app.delete("/files/{delete_file}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_file(file_id : int, file_name: str, db:db_dependency):
-    file_model = db.query(File).filter(File.id == file_id).first()
-    if file_model is None:
+async def delete_file(file_name: str, db:db_dependency, ):
+    delete_file = db.query(File).filter(File.file_name == file_name).all()
+    if delete_file is None:
         raise HTTPException(status_code=404, detail='File not found')
     
-    db.query(File).filter(File.id == file_id).delete()
+    for files in delete_file:
+        db.delete(files)
+
     db. commit()
 
 
@@ -192,9 +179,6 @@ async def delete_file(file_id : int, file_name: str, db:db_dependency):
 
 # #     # db.add(file_model)
 # #     db.commit()
-
-
-
 
 
 
